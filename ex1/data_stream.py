@@ -70,24 +70,20 @@ class SensorStream(DataStream):
     def process_batch(self, data_batch: List[Any]) -> str:
 
         try:
-
             if (isinstance(data_batch, List) is False):
-                raise Exception("Error data is not a list, data type -> "
+                raise Exception("🎯​ data is not a list, data type -> "
                                 f"{type(data_batch)}")
-
             data_f = self.filter_data(data_batch)
             if (len(data_f) <= 0):
-                raise Exception("Error data is empty, no valid data found")
+                raise Exception("🎯​ data is empty, no valid data found")
             for data in data_f:
                 float(data[1])
                 self.sensor_report += 1
                 if (data[0] == "temp"):
                     self.avg_t.append(data[1])
-
         except (Exception, ValueError) as e:
             print(e)
             return ("0 readings")
-
         else:
             return (f"{self.sensor_report} readings")
 
@@ -160,17 +156,33 @@ def data_stream() -> None:
                 "login", "error", "logout"
                 ]
 
+# 🧺​
+
     print("Initializing Sensor Stream...")
     sensor_stream = SensorStream("SENSOR_001", "Sensor")
     print(f"Stream ID: {sensor_stream.stream_id}, Type: Environmental Data")
     data_batch_filtered = sensor_stream.filter_data(data_batch)
-    print(f"Processing sensor batch: "
-          f"[{''.join(f'{x}:{y}, ' for x, y in data_batch_filtered)}]")
-    print(f"Sensor analysis: {sensor_stream.process_batch(data_batch)} \
-processed, avg temp: {sensor_stream.get_stats()['average_temperature']}°C")
+
+    data = []
+    for x, y in data_batch_filtered:
+        data.append(f"{x}:{y}")
+    print("Processing sensor batch: [", end="")
+    print(*data, sep=", ", end="]\n")
+
+    print("\n" + f"Sensor analysis: {sensor_stream.process_batch(data_batch)}"
+                 " processed, avg temp: "
+                 f"{sensor_stream.get_stats()['average_temperature']}°C")
 
 # 🔰​
 
+    print("\n" + "Initializing Transaction Stream...")
+    trans_stream = TransactionStream("TRANS_001", "Trans")
+    print(f"Stream ID: {trans_stream.stream_id}, Type: Financial Data")
+    data_batch_filtered = trans_stream.filter_data(data_batch)
+
+    data = []
+    for x, y in data_batch_filtered:
+        data.append(f"{x}:{y}")
 
 # =============================================================================
 # =============================== MAIN ========================================
