@@ -83,7 +83,7 @@ class SensorStream(DataStream):
                     self.avg_t.append(data[1])
         except (Exception, ValueError) as e:
             print(e)
-            return ("0 readings")
+            return ("0 reading")
         else:
             return (f"{self.sensor_report} readings")
 
@@ -123,7 +123,57 @@ class SensorStream(DataStream):
 
 
 class TransactionStream(DataStream):
-    pass
+    def __init__(self, stream_id: str, type: str):
+        super().__init__(stream_id, type)
+
+        self.trans_operation = 0
+        self.net_f = []
+
+# 🛩️​
+
+    def process_batch(self, data_batch: List[Any]) -> str:
+
+        try:
+            if (isinstance(data_batch, List) is False):
+                raise Exception("🎯​ data is not a list, data type -> "
+                                f"{type(data_batch)}")
+            data_f = self.filter_data(data_batch)
+            if (len(data_f) <= 0):
+                raise Exception("🎯​ data is empty, no valid data found")
+            for data in data_f:
+                int(data[1])
+                self.trans_operation += 1
+                if (data[0] == "sell"):
+                    self.net_f.append(data[1])
+                if (data[0] == "buy"):
+                    self.net_f.append(-data[1])
+        except (Exception, ValueError) as e:
+            print(e)
+            return ("0 operation")
+        else:
+            return (f"{self.trans_operation} operations")
+
+# 🛩️​
+
+    def filter_data(self, data_batch: List[Union[tuple, str]],
+                    criteria: Optional[str] = None) -> List[tuple]:
+        filtered_data = []
+        for data in data_batch:
+            if (isinstance(data, tuple) is True
+                    and data[0] in ["sell", "buy"]):
+                filtered_data.append(data)
+
+        if (criteria == "High-priority"):
+            for data in filtered_data:
+                if ((data[0] == "sell" and (data[1] < 0))
+                    or (data[0] == "buy"
+                        and (data[1] < 0))):
+                    return (data)
+        return (filtered_data)
+# 🛩️​
+
+    def get_stats(self) -> Dict[str, Union[str, int, float]]:
+        return {"net flow:": -sum(self.net_f)}
 
 
 # =============================================================================
@@ -132,12 +182,60 @@ class TransactionStream(DataStream):
 
 
 class EventStream(DataStream):
-    pass
+    def __init__(self, stream_id: str, type: str):
+        super().__init__(stream_id, type)
+
+        self.nbr_event = 0
+        self.error_detect = 0
+
+# 🛩️​
+
+    def process_batch(self, data_batch: List[Any]) -> str:
+        try:
+            if (isinstance(data_batch, List) is False):
+                raise Exception("🎯​ data is not a list, data type -> "
+                                f"{type(data_batch)}")
+            data_f = self.filter_data(data_batch)
+            if (len(data_f) <= 0):
+                raise Exception("🎯​ data is empty, no valid data found")
+            for data in data_f:
+                str(data)
+                if (data == "login" or data == "logout"):
+                    self.nbr_event += 1
+                if (data == "error"):
+                    self.nbr_event += 1
+                    self.error_detect += 1
+        except (Exception, ValueError) as e:
+            print(e)
+            return ("0 event")
+        else:
+            return (f"{self.nbr_event} events")
+
+# 🛩️​
+
+    def filter_data(self, data_batch: List[Union[tuple, str]],
+                    criteria: Optional[str] = None) -> List[str]:
+        filtered_data = []
+        for data in data_batch:
+            if (isinstance(data, str) is True
+                    and data in ["login", "logout", "error"]):
+                filtered_data.append(data)
+
+        if (criteria == "High-priority"):
+            for data in filtered_data:
+                if (data == "error"):
+                    return (data)
+        return (filtered_data)
+
+# 🛩️​
+
+    def get_stats(self) -> Dict[str, Union[str, int, float]]:
+        return (f"{self.error_detect} error detected")
 
 
 # ============================= No Parent =====================================
 # ========================== StreamProcessor ==================================
-# =============================================================================
+# =============================  Miskine ======================================
 
 
 class StreamProcessor():
@@ -164,10 +262,10 @@ def data_stream() -> None:
     data_batch_filtered = sensor_stream.filter_data(data_batch)
 
     data = []
-    for x, y in data_batch_filtered:
-        data.append(f"{x}:{y}")
+    for n, v in data_batch_filtered:
+        data.append(f"{n}:{v}")
     print("Processing sensor batch: [", end="")
-    print(*data, sep=", ", end="]\n")
+    print(*data, sep=", ", end="]")
 
     print("\n" + f"Sensor analysis: {sensor_stream.process_batch(data_batch)}"
                  " processed, avg temp: "
@@ -181,8 +279,40 @@ def data_stream() -> None:
     data_batch_filtered = trans_stream.filter_data(data_batch)
 
     data = []
-    for x, y in data_batch_filtered:
-        data.append(f"{x}:{y}")
+    for n, v in data_batch_filtered:
+        data.append(f"{n}:{v}")
+    print("Processing transaction batch: [", end="")
+    print(*data, sep=", ", end="]")
+    print("\n" + "Transaction analysis: "
+                 f"{trans_stream.process_batch(data_batch)}"
+                 " processed, net flow: "
+                 f"{trans_stream.get_stats()['net flow:']}")
+
+# 🔰​
+
+    print("\n" + "Initializing Event Stream...")
+    event_stream = EventStream("EVENT_001", "Event")
+    print(f"Stream ID: {event_stream.stream_id}, Type: System Events")
+    data_batch_filtered = event_stream.filter_data(data_batch)
+
+    data = []
+    for n in data_batch_filtered:
+        data.append(f"{n}")
+    print("Processing transaction batch: [", end="")
+    print(*data, sep=", ", end="]")
+    print("\n" + "Event analysis: "
+                 f"{event_stream.process_batch(data_batch)}"
+                 " events, "
+                 f"{event_stream.get_stats()}")
+
+# 🔰​
+
+    print("\n" + " Polymorphic Stream Processing ".center(79, "=") + "\n")
+    print("Processing mixed stream types through unified interface..." + "\n")
+
+    print("Batch 1 Results:")
+
+    print("Stream filtering active: High-priority data only")
 
 # =============================================================================
 # =============================== MAIN ========================================
