@@ -18,13 +18,13 @@ class DataProcessor(ABC):
     def process(self, data: Any) -> str:
         pass
 
-# 0️⃣​
+# 🛩️​
 
     @abstractmethod
     def validate(self, data: Any) -> bool:
         pass
 
-# 0️⃣​
+# 🛩️​
 
     def format_output(self, result: str) -> str:
         return ("Output: " + result)
@@ -44,7 +44,7 @@ class NumericProcessor(DataProcessor):
         else:
             return ("🎯​ data was not validate, please verify your input")
 
-# 1️⃣​
+# 🛩️​
 
     def validate(self, data: List[int]) -> bool:
         try:
@@ -61,7 +61,7 @@ class NumericProcessor(DataProcessor):
         else:
             return (True)
 
-# 1️⃣​
+# 🛩️​
 
     def format_output(self, result: str) -> str:
         return super().format_output(result)
@@ -79,7 +79,7 @@ class TextProcessor(DataProcessor):
             return (f"Processed text: {len(data)} "
                     f"characters, {len(data.split())} words")
 
-# 2️⃣​
+# 🛩️​
 
     def validate(self, data: str) -> bool:
         try:
@@ -94,7 +94,7 @@ class TextProcessor(DataProcessor):
         else:
             return (True)
 
-# 2️⃣​
+# 🛩️​
 
     def format_output(self, result: str) -> str:
         return super().format_output(result)
@@ -115,7 +115,7 @@ class LogProcessor(DataProcessor):
                 return (f"[INFO] {log[0]} level detected:{log[1]}")
         return "Error: data was not validate, please verify your input"
 
-# 3️⃣​
+# 🛩️​
 
     def validate(self, data: str) -> bool:
         try:
@@ -130,7 +130,7 @@ class LogProcessor(DataProcessor):
         else:
             return (True)
 
-# 3️⃣​
+# 🛩️​
 
     def format_output(self, result: str) -> str:
         return super().format_output(result)
