@@ -3,6 +3,21 @@
 from abc import ABC, abstractmethod
 from typing import Any, List, Dict, Union, Optional
 
+# super()
+# try/except
+# ABC avec @abstractmethod
+# isinstance()
+
+# DataStream class abstraite
+# SensorStream(stream_id), TransactionStream(stream_id), EventStream(stream_id)
+
+# process_batch(self, ...) - Traite un lot de données <- @abstractmethod
+# filter_data(self, ...) - Filtre les données en fonction de critères
+# get_stats(self) - Renvoie les statistiques du flux
+# StreamProcessor qui gère plusieurs types de flux de manière polymorphe
+# Fonctionnalité : traitement par lots, filtrage, pipelines de transformation
+
+# StreamProcessor gere n'importe quel type de flux grâce au polymorphisme
 
 
 # =============================================================================
@@ -20,7 +35,6 @@ class DataStream(ABC):
     def process_batch(self, data_batch: List[Any]) -> str:
         pass
 
-    @abstractmethod
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
         pass
