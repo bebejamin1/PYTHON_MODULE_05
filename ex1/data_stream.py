@@ -59,11 +59,11 @@ class SensorStream(DataStream):
             data_f = self.filter_data(data_batch)
             if (len(data_f) <= 0):
                 raise Exception("🎯​ data is empty, no valid data found")
-            for data in data_f:
-                float(data[1])
-                self.sensor_report += 1
-                if (data[0] == "temp"):
-                    self.avg_t.append(data[1])
+
+            self.avg_t = [float(data[1]) for data in data_f
+                          if (data[0] == "temp")]
+            self.sensor_report += len(data_f)
+
         except (Exception, ValueError) as e:
             print(e)
             return ("0 reading")
@@ -74,11 +74,10 @@ class SensorStream(DataStream):
 
     def filter_data(self, data_batch: List[Union[tuple, str]],
                     criteria: Optional[str] = None) -> List[tuple]:
-        filtered_data = []
-        for data in data_batch:
-            if (isinstance(data, tuple) is True
-                    and data[0] in ["temp", "humidity", "presure"]):
-                filtered_data.append(data)
+
+        filtered_data = [data for data in data_batch
+                         if (isinstance(data, tuple) is True
+                             and data[0] in ["temp", "humidity", "presure"])]
 
         if (criteria == "High-priority"):
             for data in filtered_data:
@@ -110,7 +109,8 @@ class TransactionStream(DataStream):
         super().__init__(stream_id, type)
 
         self.trans_operation = 0
-        self.net_f = []
+        self.net_sell = []
+        self.net_buy = []
 
 # 🛩️​
 
@@ -123,13 +123,13 @@ class TransactionStream(DataStream):
             data_f = self.filter_data(data_batch)
             if (len(data_f) <= 0):
                 raise Exception("🎯​ data is empty, no valid data found")
-            for data in data_f:
-                int(data[1])
-                self.trans_operation += 1
-                if (data[0] == "sell"):
-                    self.net_f.append(data[1])
-                if (data[0] == "buy"):
-                    self.net_f.append(-data[1])
+
+            self.net_sell = [int(data[1]) for data in data_f
+                             if (data[0] == "sell")]
+            self.net_buy = [int(data[1]) for data in data_f
+                            if (data[0] == "buy")]
+            self.trans_operation += len(self.net_sell) + len(self.net_buy)
+
         except (Exception, ValueError) as e:
             print(e)
             return ("0 operation")
@@ -140,11 +140,10 @@ class TransactionStream(DataStream):
 
     def filter_data(self, data_batch: List[Union[tuple, str]],
                     criteria: Optional[str] = None) -> List[tuple]:
-        filtered_data = []
-        for data in data_batch:
-            if (isinstance(data, tuple) is True
-                    and data[0] in ["sell", "buy"]):
-                filtered_data.append(data)
+
+        filtered_data = [data for data in data_batch
+                         if (isinstance(data, tuple) is True
+                             and data[0] in ["sell", "buy"])]
 
         if (criteria == "High-priority"):
             for data in filtered_data:
@@ -153,10 +152,11 @@ class TransactionStream(DataStream):
                         and (data[1] < 0))):
                     return (data)
         return (filtered_data)
+
 # 🛩️​
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
-        return {"net flow:": -sum(self.net_f)}
+        return {"net flow:": (sum(self.net_buy) - sum(self.net_sell))}
 
 
 # =============================================================================
@@ -198,11 +198,10 @@ class EventStream(DataStream):
 
     def filter_data(self, data_batch: List[Union[tuple, str]],
                     criteria: Optional[str] = None) -> List[str]:
-        filtered_data = []
-        for data in data_batch:
-            if (isinstance(data, str) is True
-                    and data in ["login", "logout", "error"]):
-                filtered_data.append(data)
+
+        filtered_data = [data for data in data_batch
+                         if (isinstance(data, str) is True
+                             and data in ["login", "logout", "error"])]
 
         if (criteria == "High-priority"):
             for data in filtered_data:
@@ -223,6 +222,7 @@ class EventStream(DataStream):
 
 class StreamProcessor():
     pass
+
 
 # =============================================================================
 # ============================ DATA STREAM ====================================
@@ -268,8 +268,8 @@ def data_stream() -> None:
     print(*data, sep=", ", end="]")
     print("\n" + "Transaction analysis: "
                  f"{trans_stream.process_batch(data_batch)}"
-                 " processed, net flow: "
-                 f"{trans_stream.get_stats()['net flow:']}")
+                 " processed, net flow: +"
+                 f"{trans_stream.get_stats()['net flow:']} units")
 
 # 🔰​
 

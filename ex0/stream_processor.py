@@ -61,11 +61,6 @@ class NumericProcessor(DataProcessor):
         else:
             return (True)
 
-# 🛩️​
-
-    def format_output(self, result: str) -> str:
-        return super().format_output(result)
-
 
 # =============================== Child =======================================
 # =========================== TextProcessor ===================================
@@ -94,10 +89,6 @@ class TextProcessor(DataProcessor):
         else:
             return (True)
 
-# 🛩️​
-
-    def format_output(self, result: str) -> str:
-        return super().format_output(result)
 
 # =============================== Child =======================================
 # ============================ LogProcessor ===================================
@@ -129,11 +120,6 @@ class LogProcessor(DataProcessor):
             return (False)
         else:
             return (True)
-
-# 🛩️​
-
-    def format_output(self, result: str) -> str:
-        return super().format_output(result)
 
 
 # =============================================================================
