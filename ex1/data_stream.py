@@ -178,6 +178,7 @@ class EventStream(DataStream):
             if (isinstance(data_batch, List) is False):
                 raise Exception("🎯​ data is not a list, data type -> "
                                 f"{type(data_batch)}")
+
             data_f = self.filter_data(data_batch)
             if (len(data_f) <= 0):
                 raise Exception("🎯​ data is empty, no valid data found")
@@ -217,11 +218,19 @@ class EventStream(DataStream):
 
 # ============================= No Parent =====================================
 # ========================== StreamProcessor ==================================
-# =============================  Miskine ======================================
+# =============================================================================
 
 
 class StreamProcessor():
-    pass
+
+    def process_batch(self, data_batch: List[Any],
+                      streams: List[object]) -> None:
+        pass
+
+    def process_batch_filtered(self, data_batch: List[Any],
+                               streams: List[Any],
+                               criteria: str) -> Dict[str, int]:
+        pass
 
 
 # =============================================================================
@@ -236,6 +245,24 @@ def data_stream() -> None:
                 ("buy", 100), ("sell", 150), ("buy", 75),
                 "login", "error", "logout"
                 ]
+
+    data_batch2 = [
+                ("temp", 22.5), ("humidity", 65), ("presure", 1013),
+                ("buy", 100), ("sell", 150), ("buy", 75),
+                "login", "error", "logout"
+                ]
+
+    data_batch3 = [
+                ("temp", 22.5), ("humidity", 65), ("presure", 1013),
+                ("buy", 100), ("sell", 150), ("buy", 75),
+                "login", "error", "logout"
+                ]
+
+    stream_type = [
+                   SensorStream("SENSOR_002", "Sensor"),
+                   TransactionStream("TRANS_002", "Transaction"),
+                   EventStream("EVENT_001", "Event")
+                   ]
 
 # 🧺​
 
@@ -290,12 +317,19 @@ def data_stream() -> None:
 
 # 🔰​
 
-    print("\n" + " Polymorphic Stream Processing ".center(79, "=") + "\n")
+    print("\n" + " Polymorphic Stream Processing ".center(79, "="))
     print("Processing mixed stream types through unified interface..." + "\n")
 
     print("Batch 1 Results:")
+    StreamProcessor().process_batch(data_batch2, stream_type)
 
     print("Stream filtering active: High-priority data only")
+    filtered_result = StreamProcessor().process_batch_filtered(data_batch3,
+                                                               stream_type,
+                                                               "High-priority")
+    print(f"Filtered results: {filtered_result['Sensor']} "
+          f"critical sensor alerts, {filtered_result['Transaction']}"
+          " large transaction")
 
 
 # =============================================================================
