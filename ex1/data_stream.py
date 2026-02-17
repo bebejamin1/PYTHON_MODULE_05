@@ -19,8 +19,6 @@ class DataStream(ABC):
         self.stream_id = stream_id
         self.type = type
 
-# 🛩️​
-
     @abstractmethod
     def process_batch(self, data_batch: List[Any]) -> str:
         pass
@@ -28,8 +26,6 @@ class DataStream(ABC):
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
         pass
-
-# 🛩️​
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         pass
@@ -47,8 +43,6 @@ class SensorStream(DataStream):
 
         self.sensor_report = 0
         self.avg_t = []
-
-# 🛩️​
 
     def process_batch(self, data_batch: List[Any]) -> str:
 
@@ -70,8 +64,6 @@ class SensorStream(DataStream):
         else:
             return (f"{self.sensor_report} readings")
 
-# 🛩️​
-
     def filter_data(self, data_batch: List[Union[tuple, str]],
                     criteria: Optional[str] = None) -> List[tuple]:
 
@@ -88,8 +80,6 @@ class SensorStream(DataStream):
                         and (data[1] < 1005 or data[1] > 1025))):
                     return (data)
         return (filtered_data)
-
-# 🛩️​
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         try:
@@ -111,8 +101,6 @@ class TransactionStream(DataStream):
         self.trans_operation = 0
         self.net_sell = []
         self.net_buy = []
-
-# 🛩️​
 
     def process_batch(self, data_batch: List[Any]) -> str:
 
@@ -136,8 +124,6 @@ class TransactionStream(DataStream):
         else:
             return (f"{self.trans_operation} operations")
 
-# 🛩️​
-
     def filter_data(self, data_batch: List[Union[tuple, str]],
                     criteria: Optional[str] = None) -> List[tuple]:
 
@@ -152,8 +138,6 @@ class TransactionStream(DataStream):
                         and (data[1] < 0))):
                     return (data)
         return (filtered_data)
-
-# 🛩️​
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         return {"net flow:": (sum(self.net_buy) - sum(self.net_sell))}
@@ -170,8 +154,6 @@ class EventStream(DataStream):
 
         self.nbr_event = 0
         self.error_detect = 0
-
-# 🛩️​
 
     def process_batch(self, data_batch: List[Any]) -> str:
         try:
@@ -195,8 +177,6 @@ class EventStream(DataStream):
         else:
             return (f"{self.nbr_event} events")
 
-# 🛩️​
-
     def filter_data(self, data_batch: List[Union[tuple, str]],
                     criteria: Optional[str] = None) -> List[str]:
 
@@ -209,8 +189,6 @@ class EventStream(DataStream):
                 if (data == "error"):
                     return (data)
         return (filtered_data)
-
-# 🛩️​
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         return (f"{self.error_detect} error detected")
@@ -225,12 +203,18 @@ class StreamProcessor():
 
     def process_batch(self, data_batch: List[Any],
                       streams: List[object]) -> None:
-        pass
+        for stream in streams:
+            result = stream.process_batch(data_batch)
+            print(f"- {stream.type} data: {result} processed")
 
     def process_batch_filtered(self, data_batch: List[Any],
                                streams: List[Any],
                                criteria: str) -> Dict[str, int]:
-        pass
+        liste = []
+        for stream in streams:
+            liste.append(len(stream.filter_data(data_batch, criteria)))
+
+        return {key.type: value for key, value in zip(streams, liste)}
 
 
 # =============================================================================
@@ -247,14 +231,14 @@ def data_stream() -> None:
                 ]
 
     data_batch2 = [
-                ("temp", 22.5), ("humidity", 65), ("presure", 1013),
-                ("buy", 100), ("sell", 150), ("buy", 75),
+                ("temp", 22.5), ("humidity", 65),
+                ("buy", 100), ("sell", 150), ("buy", 75), ("sell", 35),
                 "login", "error", "logout"
                 ]
 
     data_batch3 = [
-                ("temp", 22.5), ("humidity", 65), ("presure", 1013),
-                ("buy", 100), ("sell", 150), ("buy", 75),
+                ("temp", -500), ("humidity", 20000), ("presure", 1013),
+                ("buy", 100), ("sell", 150000000), ("buy", 75),
                 "login", "error", "logout"
                 ]
 
@@ -323,7 +307,7 @@ def data_stream() -> None:
     print("Batch 1 Results:")
     StreamProcessor().process_batch(data_batch2, stream_type)
 
-    print("Stream filtering active: High-priority data only")
+    print("\n" + "Stream filtering active: High-priority data only")
     filtered_result = StreamProcessor().process_batch_filtered(data_batch3,
                                                                stream_type,
                                                                "High-priority")

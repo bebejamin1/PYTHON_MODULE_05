@@ -18,13 +18,9 @@ class DataProcessor(ABC):
     def process(self, data: Any) -> str:
         pass
 
-# 🛩️​
-
     @abstractmethod
     def validate(self, data: Any) -> bool:
         pass
-
-# 🛩️​
 
     def format_output(self, result: str) -> str:
         return ("Output: " + result)
@@ -43,8 +39,6 @@ class NumericProcessor(DataProcessor):
                     f"sum={sum(data)}, vg={sum(data) / len(data)}")
         else:
             return ("🎯​ data was not validate, please verify your input")
-
-# 🛩️​
 
     def validate(self, data: List[int]) -> bool:
         try:
@@ -73,8 +67,6 @@ class TextProcessor(DataProcessor):
         if (TextProcessor().validate(data) is True):
             return (f"Processed text: {len(data)} "
                     f"characters, {len(data.split())} words")
-
-# 🛩️​
 
     def validate(self, data: str) -> bool:
         try:
@@ -105,8 +97,6 @@ class LogProcessor(DataProcessor):
             if (log[0] == "INFO"):
                 return (f"[INFO] {log[0]} level detected:{log[1]}")
         return "Error: data was not validate, please verify your input"
-
-# 🛩️​
 
     def validate(self, data: str) -> bool:
         try:
