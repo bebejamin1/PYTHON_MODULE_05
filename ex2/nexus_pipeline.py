@@ -7,6 +7,7 @@ from typing import Any, Dict, Union, Protocol
 # super() try/except
 # ABC avec @abstractmethod et Protocol pour le duck typing
 # pipeline
+# list and dict comprehensions
 
 # =============================================================================
 # ========================= Methods / Class ===================================
@@ -25,10 +26,13 @@ class ProcessingPipeline(ABC):
         self.stages = []
 
     @abstractmethod
-    def process(self, data: Any) -> Union[str, Any]:
+    def process(self, data: Any) -> Any:
         pass
 
     def add_stage() -> None:
+        pass
+
+    def run_stages(self, data: Any) -> Any:
         pass
 
 
@@ -38,11 +42,9 @@ class ProcessingPipeline(ABC):
 
 
 class JSONAdapter(ProcessingPipeline):
-    def __init__(self, pipeline_id: str) -> None:
-        super().__init__(pipeline_id)
 
     def process(self, data: Any) -> Union[str, Any]:
-        pass
+        return (self.run_stages(data))
 
 
 # ============================= Child =========================================
@@ -51,11 +53,9 @@ class JSONAdapter(ProcessingPipeline):
 
 
 class CSVAdapter(ProcessingPipeline):
-    def __init__(self, pipeline_id: str) -> None:
-        super().__init__(pipeline_id)
 
     def process(self, data: Any) -> Union[str, Any]:
-        pass
+        return (self.run_stages(data))
 
 
 # ============================= Child =========================================
@@ -64,11 +64,9 @@ class CSVAdapter(ProcessingPipeline):
 
 
 class StreamAdapter(ProcessingPipeline):
-    def __init__(self, pipeline_id: str) -> None:
-        super().__init__(pipeline_id)
 
     def process(self, data: Any) -> Union[str, Any]:
-        pass
+        return (self.run_stages(data))
 
 
 # =========================== Protocol ========================================
@@ -136,7 +134,30 @@ class NexusManager():
 
 
 def nexus_pipeline():
-    pass
+
+    print("Initializing Nexus Manager...")
+    print("Pipeline capacity: 1000 streams/second" + "\n")
+
+    manager = NexusManager()
+    print("Creating Data Processing Pipeline...")
+
+    print("Creating Data Processing Pipeline...")
+    input_stage = InputStage()
+    print("Stage 1: Input validation and parsing")
+    transform_stage = TransformStage()
+    print("Stage 2: Data transformation and enrichment")
+    output_stage = OutputStage()
+    print("Stage 3: Output formatting and delivery")
+
+    print("\n" + " Multi-Format Data Processing ".center(79, "=") + "\n")
+    json_pipeline = JSONAdapter("Pipeline A")
+    csv_pipeline = CSVAdapter("Pipeline B")
+    stream_pipeline = StreamAdapter("Pipeline C")
+
+    pipelines = [json_pipeline, csv_pipeline, stream_pipeline]
+
+    stages = [input_stage, transform_stage, output_stage]
+
 
 # =============================================================================
 # =============================== main ========================================
@@ -144,6 +165,6 @@ def nexus_pipeline():
 
 
 if __name__ == "__main__":
-    print(" CODE NEXUS - ENTERPRISE PIPELINE SYSTEM ".center(79, "="))
+    print(" CODE NEXUS - ENTERPRISE PIPELINE SYSTEM ".center(79, "=") + "\n")
     nexus_pipeline()
-    print("Nexus Integration complete. All systems operational.")
+    print("\n" + "Nexus Integration complete. All systems operational.")
