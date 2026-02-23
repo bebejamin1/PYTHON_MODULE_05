@@ -1,13 +1,21 @@
 #! /bin/python3.10
+# ########################################################################### #
+#                                                                             #
+#                                                          :::      ::::::::  #
+#   nexus_pipeline.py                                    :+:      :+:    :+:  #
+#                                                      +:+ +:+         +:+    #
+#   By: bbeaurai <bbeaurai@student.42lehavre.fr>     +#+  +:+       +#+       #
+#                                                  +#+#+#+#+#+   +#+          #
+#   Created: 2026/02/23 10:26:43 by bbeaurai            #+#    #+#            #
+#   Updated: 2026/02/23 10:27:50 by bbeaurai           ###   ########.fr      #
+#                                                                             #
+# ########################################################################### #
+
 
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Union, Protocol
 import time
 
-# super() try/except
-# ABC avec @abstractmethod et Protocol pour le duck typing
-# pipeline
-# list and dict comprehensions
 
 # =============================================================================
 # ========================= Methods / Class ===================================
